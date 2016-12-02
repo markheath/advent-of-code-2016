@@ -22,4 +22,4 @@ let input = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt")
 
 solve keypadA (2,2) testInput
 solve keypadA (2,2) input // part a - my answer is 44558
-solve keypadB (3,3) input // part b - my answer is 6BBAD
+solve keypadB (1,3) input // part b - my answer is 6BBAD
