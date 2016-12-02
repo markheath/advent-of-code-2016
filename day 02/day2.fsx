@@ -38,7 +38,7 @@ let followLine pos line =
 //instructions |> Seq.fold folder ((1,1),[])
 let lookup (x,y) = keypad.[y].[x]
 
-// part a - my answer is 44558
+// part a - my answer is 44558, part b - my answer is 6BBAD
 instructions 
     |> Seq.scan followLine startPos
     |> Seq.skip 1 
