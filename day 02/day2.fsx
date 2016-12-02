@@ -6,8 +6,8 @@ let solve (keypad:string[]) startPos input =
         let move = match instruction with | 'U' -> (0, -1) | 'D' -> (0, 1) | 'R' -> (1,0) | 'L' -> (-1,0) | _ -> (0,0)
         let newPos = addv pos move
         if isValid newPos then newPos else pos
-    let followLine pos line =
-        line |> Seq.fold followInstruction pos
+    let followLine pos =
+        Seq.fold followInstruction pos
     input 
         |> Seq.scan followLine startPos
         |> Seq.skip 1 
