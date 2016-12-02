@@ -42,7 +42,6 @@ let lookup (x,y) = keypad.[y].[x]
 instructions 
     |> Seq.scan followLine startPos
     |> Seq.skip 1 
-    |> Seq.map lookup 
-    |> Seq.map string 
+    |> Seq.map (lookup >> string) 
     |> String.Concat 
     |> printfn "Part a: %s"
