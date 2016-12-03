@@ -14,8 +14,8 @@ let batch batchSize (array:'T[]) =
     [for b in 0 .. (array.Length / batchSize) - 1 -> b * batchSize]
     |> Seq.map (fun n -> [| for i in [n..n+batchSize-1] -> array.[i]|])  
 
-let swap3 [| [|a1;b1;c1;|] ; [|a2;b2;c2;|] ; [|a3;b3;c3;|] |] =
-            [| [|a1;a2;a3;|]; [|b1;b2;b3;|]; [|c1;c2;c3;|] |]
+let rotate (a:'T[][]) = 
+    [| for x in [0..a.[0].Length-1] -> [| for y in [0..a.Length-1] -> a.[y].[x] |]  |]
 
-let sides = input |> Array.map getSides |> batch 3 |> Seq.map swap3 |> Seq.collect id 
+let sides = input |> Array.map getSides |> batch 3 |> Seq.map rotate |> Seq.collect id 
 sides |> Seq.filter isPossibleTriangle |> Seq.length |> printfn "Part b: %d" // my answer = 1826
