@@ -12,7 +12,7 @@ input |> Seq.map getSides |> Seq.filter isPossibleTriangle |> Seq.length |> prin
 
 let batch batchSize (array:'T[]) =
     [for b in 0 .. (array.Length / batchSize) - 1 -> b * batchSize]
-    |> Seq.map (fun n -> [| for i in [n..n+batchSize-1] -> array.[i]|])  
+    |> Seq.map (fun n -> array.[n..n+batchSize-1])  
 
 let rotate (a:'T[][]) = 
     [| for x in [0..a.[0].Length-1] -> [| for y in [0..a.Length-1] -> a.[y].[x] |]  |]
