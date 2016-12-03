@@ -10,12 +10,14 @@ let getSides line =
 
 input |> Seq.map getSides |> Seq.filter isPossibleTriangle |> Seq.length |> printfn "Part a: %d" // my answer = 982
 
+let range (n:int) = { 0 .. (n - 1) }
+
 let batch batchSize (array:'T[]) =
-    [for b in 0 .. (array.Length / batchSize) - 1 -> b * batchSize]
+    [for b in range (array.Length / batchSize) -> b * batchSize]
     |> Seq.map (fun n -> array.[n..n+batchSize-1])  
 
 let rotate (a:'T[][]) = 
-    [| for x in [0..a.[0].Length-1] -> [| for y in [0..a.Length-1] -> a.[y].[x] |]  |]
+    [| for x in range a.[0].Length -> [| for y in range a.Length -> a.[y].[x] |]  |]
 
 let sides = input |> Array.map getSides |> batch 3 |> Seq.map rotate |> Seq.collect id 
 sides |> Seq.filter isPossibleTriangle |> Seq.length |> printfn "Part b: %d" // my answer = 1826
