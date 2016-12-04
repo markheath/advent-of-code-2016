@@ -35,3 +35,17 @@ let testInput = [|
 testInput |> Array.map parseRoom |> Array.filter isRealRoom |> Seq.sumBy (fun r -> r.sectorId) |> printfn "Test: %d" // 1514
 input |> Array.map parseRoom |> Array.filter isRealRoom |> Seq.sumBy (fun r -> r.sectorId) |> printfn "Part a: %d" // 158835
 
+let shiftBy (n:int) (c:char) =
+    char (int 'a' + (int c - int 'a' + n) % 26)
+
+let decryptName n name =
+    name |> Seq.map (function | '-' -> ' ' | a -> shiftBy n a) |> System.String.Concat
+
+let decryptRoom r = decryptName r.sectorId r.name
+
+// decryptName 343 "qzmt-zixmtkozy-ivhz"
+
+let isStorageRoom r = (decryptRoom r).StartsWith("northpole object storage")
+
+let storageRoom = input |> Array.map parseRoom |> Array.filter isRealRoom |> Array.find isStorageRoom
+printfn "Part b: %d" storageRoom.sectorId // 993 
