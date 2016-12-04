@@ -6,22 +6,18 @@ let parseRoom room =
     Regex.Match(room,@"([a-z\-]+)(\d+)\[([a-z]+)\]").Groups
      |> Seq.cast<Group>
      |> Seq.map (fun g -> g.Value)
-     |> Seq.skip 1
      |> Seq.toList
-     |> function | [a;b;c] -> {name=a;sectorId=int b; checksum=c} | x -> failwith "Parse Error"
+     |> function | [_;a;b;c] -> {name=a;sectorId=int b; checksum=c} | x -> failwith "Parse Error"
 
-let calcChecksum room =
-    room.name.Replace("-","") 
+let calcChecksum (roomName:string) =
+    roomName.Replace("-","") 
     |> Seq.countBy id 
     |> Seq.sortBy (fun (a,b)->(-b,a))
-    |> Seq.map (fun (a,_) -> a.ToString())
+    |> Seq.map (fst >> string)
     |> Seq.take 5
     |> System.String.Concat 
 
-
-//  |> Seq.map (fst >> string)
-
-let isRealRoom room = calcChecksum room = room.checksum
+let isRealRoom room = calcChecksum room.name = room.checksum
 
 let input = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt")
 
@@ -43,7 +39,7 @@ let decryptName n name =
 
 let decryptRoom r = decryptName r.sectorId r.name
 
-// decryptName 343 "qzmt-zixmtkozy-ivhz"
+decryptName 343 "qzmt-zixmtkozy-ivhz" |> printfn "Test: %s"
 
 let isStorageRoom r = (decryptRoom r).StartsWith("northpole object storage")
 
