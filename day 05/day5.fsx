@@ -3,7 +3,7 @@ open System;
 let md5 = System.Security.Cryptography.MD5.Create()
 
 let findHash doorId = 
-    let isInteresting (hash:byte[]) = hash.[0] = 0uy && hash.[1] = 0uy && hash.[2] <= 0xAuy
+    let isInteresting (hash:byte[]) = hash.[0] = 0uy && hash.[1] = 0uy && hash.[2] <= 0xFuy
     Seq.initInfinite (sprintf "%s%d" doorId) 
     |> Seq.map (System.Text.Encoding.ASCII.GetBytes >> md5.ComputeHash)
     |> Seq.filter isInteresting
