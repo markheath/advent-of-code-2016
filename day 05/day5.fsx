@@ -1,23 +1,24 @@
 open System;
 
 let md5 = System.Security.Cryptography.MD5.Create()
-let findHash doorId = seq {
-    let prefix = "00000"
-    for n in 0 .. 100000000 do
-    let inputString = sprintf "%s%d" doorId n
-    let inputBytes = System.Text.Encoding.ASCII.GetBytes(inputString)
-    let hashBytes = md5.ComputeHash(inputBytes)
-    let hashString = BitConverter.ToString(hashBytes).Replace("-","")
-    if hashString.StartsWith(prefix) then yield hashString
-}
+
+let findHash doorId = 
+    let isInteresting (hash:byte[]) = hash.[0] = 0uy && hash.[1] = 0uy && hash.[2] <= 0xAuy
+    Seq.initInfinite (sprintf "%s%d" doorId) 
+    |> Seq.map (System.Text.Encoding.ASCII.GetBytes >> md5.ComputeHash)
+    |> Seq.filter isInteresting
+    |> Seq.map (fun h -> BitConverter.ToString(h).Replace("-",""))
+
 let input = "abbhdwsy"
 
 let findPassword doorId =
     findHash doorId |> Seq.take 8 |> Seq.map (fun h-> h.Substring(5,1)) |> String.Concat |> (fun s -> s.ToLower())
 
 //findPassword "abc" |> printfn "Test: %s" // 18f47a30
-
+let sw = System.Diagnostics.Stopwatch()
+sw.Start()
 findPassword input |> printfn "Part a: %s" // 801b56a7
+printfn "part a in %dms" sw.ElapsedMilliseconds
 
 let useChar (password:string) (pos, ch) =
     if pos < 8 && password.[pos] = '?' then
@@ -32,4 +33,6 @@ let findPassword2 doorId =
     |> Seq.find (fun f -> f.IndexOf("?") = -1)
     |> (fun s -> s.ToLower())
 
+sw.Restart()
 findPassword2 input |> printfn "Part b: %s" // 424a0197
+printfn "part b in %dms" sw.ElapsedMilliseconds
