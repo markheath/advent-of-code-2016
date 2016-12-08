@@ -48,7 +48,11 @@ let applyInst (state:int[,]) = function
     |> Seq.sum
     |> printfn "Test: %d"
 
-instructions |> Array.fold applyInst (Array2D.create 6 50 0) |> Seq.cast<int> |> Seq.sum |> printfn "Part a: %d" // 116
+instructions 
+    |> Array.fold applyInst (Array2D.create 6 50 0) 
+    |> Seq.cast<int> 
+    |> Seq.sum 
+    |> printfn "Part a: %d" // 116
 
 let endState = instructions |> Array.fold applyInst (Array2D.create 6 50 0) // UPOJFLBCEZ
 
@@ -82,8 +86,6 @@ open System.Windows.Media
 open System.Windows.Media.Imaging
 open System.Windows.Shapes
 open System.Windows.Controls
-
-
 
 let drawState (state:int[,]) scale =
    
