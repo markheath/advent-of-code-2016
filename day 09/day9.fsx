@@ -2,12 +2,6 @@
 let input = System.IO.File.ReadAllText (__SOURCE_DIRECTORY__ + "\\input.txt")
 open System.Text.RegularExpressions
 
-let (|Matches|) pattern =
-  let rgx = Regex (pattern, RegexOptions.Compiled)
-  fun input -> [for m in rgx.Matches input do for g in m.Groups -> g.Value]
-
-let (|Int|_|) str = match System.Int32.TryParse str with true, value -> Some value | _ -> None
-
 type ExpandState = { parsePos: int; decoded: string }
 
 let decompress (input:string) =
@@ -34,7 +28,7 @@ decompress "(3x3)XYZ"
 decompress "(6x1)(1x3)A"
 decompress "X(8x2)(3x3)ABCY"
 
-(decompress input).Length |> printfn "Part a: %d"
+(decompress input).Length |> printfn "Part a: %d" // 110346
 
 
 type ExpandState2 = { parsePos: int; decodedLen: int64 }
@@ -59,4 +53,4 @@ let rec decompressLen (input:string) =
 
 decompressLen "(27x12)(20x12)(13x14)(7x10)(1x12)A" // 241920
 decompressLen "(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN" // 445
-decompressLen input
+decompressLen input |> printfn "Part b: %d" // 10774309173
