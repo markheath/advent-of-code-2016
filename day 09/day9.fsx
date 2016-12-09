@@ -1,4 +1,3 @@
-
 let input = System.IO.File.ReadAllText (__SOURCE_DIRECTORY__ + "\\input.txt")
 open System.Text.RegularExpressions
 
@@ -6,27 +5,25 @@ type ExpandState = { parsePos: int; decoded: string }
 
 let decompress (input:string) =
     let rec expand state =
-        let m = Regex.Match(input.Substring(state.parsePos), @"^\((\d+)x(\d+)\)")
-        if state.parsePos >= input.Length then 
-            state.decoded
+        let sub = input.Substring(state.parsePos)
+        let m = Regex.Match(sub, @"\((\d+)x(\d+)\)")
+        if m.Success then
+            let chars = int m.Groups.[1].Value
+            let repeats = int m.Groups.[2].Value
+            let repeat = input.Substring(state.parsePos + m.Index + m.Length, chars)
+            let expanded = [for i in 1..repeats -> repeat] |> List.fold (+) ""
+            expand { parsePos = state.parsePos+m.Index+m.Length+chars;
+                        decoded = state.decoded + sub.Substring(0,m.Index) + expanded}
         else
-            if m.Success then
-                let chars = int m.Groups.[1].Value
-                let repeats = int m.Groups.[2].Value
-                let repeat = input.Substring(state.parsePos + m.Index + m.Length, chars)
-                let expanded = [for i in 1..repeats -> repeat] |> List.fold (+) ""
-                expand { parsePos = state.parsePos+m.Length+chars;
-                         decoded = state.decoded + expanded}
-            else
-                expand { parsePos = state.parsePos+1; decoded = state.decoded + input.Substring(state.parsePos,1) }
+            state.decoded + sub
     
     expand { parsePos = 0; decoded = ""}
     
-decompress "ADVENT"
-decompress "A(1x5)BC"
-decompress "(3x3)XYZ"
-decompress "(6x1)(1x3)A"
-decompress "X(8x2)(3x3)ABCY"
+decompress "ADVENT" |> printfn "%s" // ADVENT
+decompress "A(1x5)BC"  |> printfn "%s" // ABBBBBC
+decompress "(3x3)XYZ"  |> printfn "%s" // XYZXYZXYZ
+decompress "(6x1)(1x3)A"  |> printfn "%s" // (1x3)A
+decompress "X(8x2)(3x3)ABCY"  |> printfn "%s" // X(3x3)ABC(3x3)ABCY
 
 (decompress input).Length |> printfn "Part a: %d" // 110346
 
