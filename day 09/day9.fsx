@@ -2,7 +2,7 @@ let input = System.IO.File.ReadAllText (__SOURCE_DIRECTORY__ + "\\input.txt")
 open System.Text.RegularExpressions
 
 let decompress (input:string) =
-    let rec expand (parsePos,decoded) =
+    let rec expand parsePos = seq {
         let sub = input.Substring(parsePos)
         let m = Regex.Match(sub, @"\((\d+)x(\d+)\)")
         if m.Success then
@@ -10,12 +10,14 @@ let decompress (input:string) =
             let repeats = int m.Groups.[2].Value
             let repeat = input.Substring(parsePos + m.Index + m.Length, chars)
             let expanded = [for i in 1..repeats -> repeat] |> List.fold (+) ""
-            expand (parsePos+m.Index+m.Length+chars,
-                    expanded :: sub.Substring(0,m.Index) :: decoded)
+            yield sub.Substring(0,m.Index)
+            yield expanded
+            yield! expand (parsePos+m.Index+m.Length+chars)
         else
-            (sub :: decoded) |> List.rev |> List.fold (+) ""  
+            yield sub
+    }  
     
-    expand (0,[])
+    expand 0 |> System.String.Concat
     
 decompress "ADVENT" |> printfn "%s" // ADVENT
 decompress "A(1x5)BC"  |> printfn "%s" // ABBBBBC
