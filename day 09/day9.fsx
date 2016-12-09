@@ -30,9 +30,9 @@ let rec decompressLen (input:string) =
         let m = Regex.Match(input.Substring(parsePos), @"\((\d+)x(\d+)\)")
         if m.Success then
             let chars = int m.Groups.[1].Value
-            let repeats = int m.Groups.[2].Value
+            let repeats = int64 m.Groups.[2].Value
             let repeat = input.Substring(parsePos + m.Index + m.Length, chars)
-            let expandedLen = (decompressLen repeat) * int64 repeats 
+            let expandedLen = (decompressLen repeat) * repeats 
             expand (parsePos + m.Index + m.Length + chars,
                     decodedLen + int64 m.Index + expandedLen)
         else
