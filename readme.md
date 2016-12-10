@@ -12,5 +12,7 @@ Read about my solutions on my blog:
  - [Day 6](http://markheath.net/post/aoc-2016-day6)
  - [Day 7](http://markheath.net/post/aoc-2016-day7)
  - [Day 8](http://markheath.net/post/aoc-2016-day8)
+ - [Day 9](http://markheath.net/post/advent-of-code%E2%80%93decompression-length)
+ - [Day 10](http://markheath.net/post/aoc-2016-day10)
 
 Be inspired by [other people's solutions](https://www.reddit.com/r/adventofcode/)
