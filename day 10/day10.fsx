@@ -11,10 +11,6 @@ let parseInstruction (inst:string) =
     if parts.[0] = "value" then StartsWith(int parts.[1],int parts.[5])
     else GivesTo(int parts.[1], asTarget [parts.[5];parts.[6]], asTarget [parts.[10];parts.[11]])
 
-let instructions = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt") |> Array.map parseInstruction
-
-//let state = instructions |> Seq.choose (function | StartsWith bot,chip -> Some (Bot int) | _ -> None)      
-
 let updateState (state:Map<Target,int list>) target chip =
     if Map.containsKey target state then
         let chips = state.[target]
@@ -28,31 +24,45 @@ let handleGive (st:Map<Target,int list>) bot low high =
         | [a;b] -> 
             let lowChip = min a b 
             let highChip = max a b
-            printfn "give from bot %d" bot 
+            if (lowChip = 17 && highChip = 61) then
+                printfn "part a: %d" bot
+            //printfn "give from bot %d" bot 
             let st2 = updateState st low lowChip
-            updateState st2 high highChip            
+            Some (updateState st2 high highChip)            
         | _ ->
-            //printfn "bot %d has only one chip" bot 
-            st
+            //printfn "bot %d has only one chip %A" bot (st.[Bot bot]) 
+            None
     else
         //printfn "bot %d has nothing" bot 
-        st 
+        None
 
-let applyInstruction state instruction = 
-    match instruction with
-    | StartsWith (bot,chip) -> updateState state (Bot bot) chip 
-    | GivesTo (bot,low,high) -> handleGive state bot low high
+let applyInstruction (state,leftovers) instruction = 
+    let result = match instruction with
+                    | StartsWith (chip, bot) -> Some (updateState state (Bot bot) chip) 
+                    | GivesTo (bot,low,high) -> handleGive state bot low high
+    match result with
+        | Some st -> (st,leftovers)
+        | None -> (state,instruction::leftovers)
 
-let s1 = instructions |> Array.fold applyInstruction Map.empty
-let s2 = instructions |> Array.fold applyInstruction s1
+let rec applyAll state instructions =
+    let (newState,leftovers)  = instructions |> List.fold applyInstruction (state, [])
+    match leftovers with 
+    | [] -> newState 
+    | _ ->
+        if List.length leftovers = List.length instructions then
+            printfn "Giving up"
+            newState    
+        else
+            applyAll newState (leftovers |> List.rev)
+      
+let instructions = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt") |> Array.map parseInstruction
+let finalState = applyAll Map.empty (instructions |> List.ofArray)
+[0;1;2] |> List.collect (fun n -> finalState.[Output n]) |> List.reduce (*) |> printfn "part b: %d" // 12803
 
-s2 |> printfn "%A"
 
-(*let mutable state = Map.empty
-
-for i in instructions do
-    match i with
-    | StartsWith (bot,chip) -> state <- updateState state (Bot bot) chip 
-    | GivesTo (bot,low,high) -> state <- handleGive state bot low high
-
-printfn "%A" (state |> Map.filter (fun c -> *)
+[StartsWith (5,2); 
+ GivesTo (2, Bot 1, Bot 0); 
+ StartsWith(3,1); 
+ GivesTo (1, Output 0, Bot 0);
+ GivesTo (2, Output 2, Output 0);
+ StartsWith (2,2)] |> applyAll Map.empty |> printfn "TEST %A"
