@@ -1,3 +1,4 @@
+// Failed attempt at solution. Works for test input, horribly slow for real input
 type Item = Generator of string | Microchip of string
 
 type State = { floor: int; items: Map<Item, int>  }
