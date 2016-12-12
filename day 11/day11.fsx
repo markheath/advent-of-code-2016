@@ -1,5 +1,5 @@
-// Failed attempt at solution. Works for test input, horribly slow for real input
-type Item = Generator of string | Microchip of string
+// breadth first solver, can do part a, still needs optimizing for part b
+type Item = Gen of string | Chip of string
 
 type State = { floor: int; items: Map<Item, int>  }
 
@@ -14,9 +14,9 @@ let rec combinations acc size set = seq {
 let comb size set = combinations[] size set
 
 let isValid items =
-    let hasGenerator t = List.contains (Generator t) items
-    let noGenerators = items |> List.forall (function | Microchip _ -> true | _ -> false)
-    let allMicrochipsMatch = items |> List.forall (function | Microchip m -> hasGenerator m | _ -> true) 
+    let hasGenerator t = List.contains (Gen t) items
+    let noGenerators = items |> List.forall (function | Chip _ -> true | _ -> false)
+    let allMicrochipsMatch = items |> List.forall (function | Chip m -> hasGenerator m | _ -> true) 
     noGenerators || allMicrochipsMatch
 
 let isSolution state = state.items |> Map.toSeq |> Seq.forall (fun (_,floor) -> floor = 4)
@@ -24,6 +24,7 @@ let isSolution state = state.items |> Map.toSeq |> Seq.forall (fun (_,floor) -> 
 let itemsOnFloor n state = state.items |> Map.toSeq |> Seq.filter (fun (item,floor) -> floor = n) |> Seq.map fst |> Seq.toList
 
 let stateIsValid (state:State) = [1..4] |> Seq.forall (fun n -> isValid (itemsOnFloor n state)) 
+
 
 let getNextStates st = seq {
     let onThisFloor = itemsOnFloor st.floor st
@@ -33,8 +34,8 @@ let getNextStates st = seq {
         if newFloor >= 1 && newFloor <=4 then 
             for [a;b] in comb 2 onThisFloor do
                 let canGoInElevator = match a,b with
-                                        | Generator g, Microchip m -> g = m
-                                        | Microchip m, Generator g -> m = g
+                                        | Gen g, Chip m -> g = m
+                                        | Chip m, Gen g -> m = g
                                         | _ -> true // 2 microchips or 2 generators
                 let newState ={ floor = newFloor; items = st.items.Add(a,newFloor).Add(b,newFloor)  }
                 if canGoInElevator && stateIsValid newState then
@@ -47,46 +48,46 @@ let getNextStates st = seq {
                     yield newState 
 }
 
-let mutable best = 100 // System.Int32.MaxValue
-let rec solve (currentState:State) (pastStates:State list) = seq {
-    let stepsSoFar =List.length pastStates
-    if stepsSoFar < best then
-        //printfn "STEP %d on floor %d" stepsSoFar currentState.floor
-        for state in getNextStates currentState do
-            if isSolution state then
-                best <- stepsSoFar + 1
-                printfn "solved %d" best
-                yield (state::pastStates)
-            else if List.contains state pastStates then
-                ()
-            else
-                yield! solve state (state::pastStates)
-}
+let seen = new System.Collections.Generic.HashSet<State>()
+let getUnseenNextStates n st =
+    getNextStates st
+    |> Seq.filter (fun s -> seen.Contains(s) |> not)
+    |> Seq.map (fun s -> seen.Add(s) |> ignore
+                         s,(n+1))
+    |> Seq.toList
 
-let testState = { floor = 1; items = [ 
-                                Microchip "hydrogen", 1
-                                Microchip "lithium", 1
-                                Generator "hydrogen", 2
-                                Generator "lithium", 3    
-                            ] |> Map.ofList } 
+
+let rec solveBreadthFirst (statesQueue:(State*int) list) =
+    match statesQueue with
+    | [] -> failwith "no solution"
+    | (head,n)::tail -> if isSolution head then n
+                        else 
+                            let children = getUnseenNextStates n head 
+                            solveBreadthFirst (List.append tail children)
+
+
+let testState = { floor = 1; items = [ Chip "h", 1; Chip "l", 1; Gen "h", 2; Gen "l", 3 ] |> Map.ofList } 
 let startState = { floor = 1; items = [
-                                        Generator "promethium", 1
-                                        Microchip "promethium", 1
-                                        Generator "cobalt", 2
-                                        Generator "curium", 2
-                                        Generator "ruthenium", 2
-                                        Generator "plutonium", 2
-                                        Microchip "cobalt", 3
-                                        Microchip "curium", 3
-                                        Microchip "ruthenium", 3
-                                        Microchip "plutonium", 3
+                                        Gen "promethium", 1
+                                        Chip "promethium", 1
+                                        Gen "cobalt", 2
+                                        Gen "curium", 2
+                                        Gen "ruthenium", 2
+                                        Gen "plutonium", 2
+                                        Chip "cobalt", 3
+                                        Chip "curium", 3
+                                        Chip "ruthenium", 3
+                                        Chip "plutonium", 3
                                     ] |> Map.ofList}
 
 
-let solution = solve startState [] |> Seq.minBy List.length 
-//solution |> Seq.find (fun _ -> true) |> (printfn "%A")
-solution |> printfn "%A"  // List.length |> printfn "%d" 
-solution |> List.length |> printfn "part a: %d"
+solveBreadthFirst [testState,0] |> printfn "Test: %d" // 11
+//solveBreadthFirst [startState,0] |> printfn "Part a: %d" // 33   
+solveBreadthFirst [ {startState with items= startState.items
+                                                        .Add(Gen "elerium", 1)
+                                                        .Add(Chip "elerium", 1)
+                                                        .Add(Gen "dilithium", 1)
+                                                        .Add(Chip "dilithium", 1)
+                                                        } ,0] |> printfn "Part b: %d"    
 
 
-//let nextState = getNextStates startState |> Seq.toArray |> printfn "%A"
