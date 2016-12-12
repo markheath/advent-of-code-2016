@@ -1,4 +1,5 @@
-// breadth first solver, can do part a, still needs optimizing for part b
+// breadth first solver, optimized enough to get part b solved in <20 mins. Lots more scope for speedup!
+open System.Collections.Generic;
 type Item = Gen of string | Chip of string
 
 type State = { floor: int; items: Map<Item, int>  }
@@ -19,12 +20,11 @@ let isValid items =
     let allMicrochipsMatch = items |> List.forall (function | Chip m -> hasGenerator m | _ -> true) 
     noGenerators || allMicrochipsMatch
 
-let isSolution state = state.items |> Map.toSeq |> Seq.forall (fun (_,floor) -> floor = 4)
+let isSolution state = state.items |> Map.forall (fun _ floor -> floor = 4)
 
 let itemsOnFloor n state = state.items |> Map.toSeq |> Seq.filter (fun (item,floor) -> floor = n) |> Seq.map fst |> Seq.toList
 
 let stateIsValid (state:State) = [1..4] |> Seq.forall (fun n -> isValid (itemsOnFloor n state)) 
-
 
 let getNextStates st = seq {
     let onThisFloor = itemsOnFloor st.floor st
@@ -33,13 +33,16 @@ let getNextStates st = seq {
     for newFloor in newFloors do
         if newFloor >= 1 && newFloor <=4 then 
             for [a;b] in comb 2 onThisFloor do
-                let canGoInElevator = match a,b with
-                                        | Gen g, Chip m -> g = m
-                                        | Chip m, Gen g -> m = g
-                                        | _ -> true // 2 microchips or 2 generators
+                let mutable yieldedPair = false // failed attempt at optimization, has no effect if declared inside loop
+            
+                let canGoInElevator,isPair = match a,b with
+                                                | Gen g, Chip m -> g = m, true
+                                                | Chip m, Gen g -> m = g,true
+                                                | _ -> true,false // 2 microchips or 2 generators
                 let newState ={ floor = newFloor; items = st.items.Add(a,newFloor).Add(b,newFloor)  }
-                if canGoInElevator && stateIsValid newState then
+                if canGoInElevator && stateIsValid newState && (not (isPair && yieldedPair)) then
                     //printfn "taking %A and %A to floor %d" a b newFloor
+                    yieldedPair <- true
                     yield newState    
             for item in onThisFloor do
                 let newState = { floor = newFloor; items = st.items.Add (item,newFloor) }
@@ -48,23 +51,30 @@ let getNextStates st = seq {
                     yield newState 
 }
 
-let seen = new System.Collections.Generic.HashSet<State>()
-let getUnseenNextStates n st =
+let getUnseenNextStates (seen:HashSet<State>) n st =
     getNextStates st
     |> Seq.filter (fun s -> seen.Contains(s) |> not)
     |> Seq.map (fun s -> seen.Add(s) |> ignore
                          s,(n+1))
-    |> Seq.toList
 
-
-let rec solveBreadthFirst (statesQueue:(State*int) list) =
-    match statesQueue with
-    | [] -> failwith "no solution"
-    | (head,n)::tail -> if isSolution head then n
-                        else 
-                            let children = getUnseenNextStates n head 
-                            solveBreadthFirst (List.append tail children)
-
+let solve startState =
+    let seen = new HashSet<State>()
+    let statesQueue = new Queue<State*int>()
+    let rec solveBreadthFirst() =
+        if statesQueue.Count = 0 then
+            failwith "no solution"
+        else
+            let (head,n) = statesQueue.Dequeue()
+            if isSolution head then n
+            else 
+                for c in getUnseenNextStates seen n head do
+                    statesQueue.Enqueue c
+                solveBreadthFirst()
+    let sw = System.Diagnostics.Stopwatch.StartNew()
+    statesQueue.Enqueue (startState,0)
+    let sol = solveBreadthFirst() 
+    printfn "%dms" sw.ElapsedMilliseconds
+    sol                        
 
 let testState = { floor = 1; items = [ Chip "h", 1; Chip "l", 1; Gen "h", 2; Gen "l", 3 ] |> Map.ofList } 
 let startState = { floor = 1; items = [
@@ -81,13 +91,11 @@ let startState = { floor = 1; items = [
                                     ] |> Map.ofList}
 
 
-solveBreadthFirst [testState,0] |> printfn "Test: %d" // 11
-//solveBreadthFirst [startState,0] |> printfn "Part a: %d" // 33   
-solveBreadthFirst [ {startState with items= startState.items
+solve testState |> printfn "Test: %d" // 11
+solve startState |> printfn "Part a: %d" // 33   
+solve  {startState with items= startState.items
                                                         .Add(Gen "elerium", 1)
                                                         .Add(Chip "elerium", 1)
                                                         .Add(Gen "dilithium", 1)
                                                         .Add(Chip "dilithium", 1)
-                                                        } ,0] |> printfn "Part b: %d"    
-
-
+                                                        }  |> printfn "Part b: %d"    // 57
