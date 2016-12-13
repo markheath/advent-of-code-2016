@@ -17,28 +17,28 @@ let stateIsValid (state:State) = Seq.forall (fun n -> isValid (itemsOnFloor n st
 
 let getNextStates st = seq {
     let onThisFloor = itemsOnFloor st.floor st
-    let newFloors = [st.floor+1;st.floor-1]
-    //printfn "Onfloor %d, going to %A" st.floor newFloors
-    for newFloor in newFloors do
-        if newFloor >= 1 && newFloor <=4 then 
-            for i in 0..onThisFloor.Length-1 do
-                let a = onThisFloor.[i]
-                for j in i+1..onThisFloor.Length-1 do
-                    let b = onThisFloor.[j]
+    let canGoInElevator = function | Gen g, Chip m -> g = m | Chip m, Gen g -> m = g | _ -> true // 2 microchips or 2 generators
 
-                    let canGoInElevator = match a,b with
-                                                    | Gen g, Chip m -> g = m
-                                                    | Chip m, Gen g -> m = g
-                                                    | _ -> true // 2 microchips or 2 generators
-                    let newState ={ floor = newFloor; items = st.items.Add(a,newFloor).Add(b,newFloor)  }
-                    if canGoInElevator && stateIsValid newState [st.floor;newFloor] then
-                        //printfn "taking %A and %A to floor %d" a b newFloor
-                        yield newState
+    let pairs = [for i in 0..onThisFloor.Length-1 do 
+                 for j in i+1..onThisFloor.Length-1 do
+                 let a,b =onThisFloor.[i],onThisFloor.[j]
+                 if canGoInElevator (a,b) then yield [a;b]
+                 ]
+    let getStates newFloor moves = seq {
+        for move in moves do 
+            let newItems = move |> List.fold (fun (items:Map<Item,int>) move -> items.Add(move,newFloor)) st.items
+            let newState = {  floor = newFloor; items = newItems  }
+            if stateIsValid newState [st.floor;newFloor] then
+                yield newState
+    }
 
-                let newState = { floor = newFloor; items = st.items.Add (a,newFloor) }
-                if stateIsValid newState [st.floor;newFloor] then
-                    //printfn "taking %A to floor %d" item newFloor
-                    yield newState 
+    // todo: restore can go in elevator? maybe irrelevant
+    if st.floor < 4 then
+        yield! getStates (st.floor+1) pairs
+        yield! getStates (st.floor+1) (onThisFloor |> Seq.map (fun a -> [a]))
+    if st.floor > 1 then
+        yield! getStates (st.floor-1) (onThisFloor |> Seq.map (fun a -> [a]))
+        yield! getStates (st.floor-1) pairs
 }
 
 let getUnseenNextStates (seen:HashSet<State>) st =
