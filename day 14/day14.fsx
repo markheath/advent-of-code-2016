@@ -50,5 +50,5 @@ solve (getHash "abc") 64 // 22728
 
 let input = "ngcjuoqr"
 solve (getHash input) 64 |> printfn "part a: %d"  // 18626
-solve (stretchedHash input) 64 |> printfn "part b: %d" // 
+solve (stretchedHash input) 64 |> printfn "part b: %d" // 20092
 
