@@ -4,10 +4,10 @@ open System.Text
 let md5 = System.Security.Cryptography.MD5.Create()
 
 // only needed to consider the first match
-let threeInARow (s:string) = 
-    s 
-    |> Seq.windowed 3
-    |> Seq.tryFind (function | [|a;b;c|] -> a=b && b=c | _ -> false)
+let threeInARow s = s
+                        |> Seq.windowed 3
+                        |> Seq.tryFind (function | [|a;b;c|] -> a=b && b=c | _ -> false)
+                        |> Option.map (fun a -> a.[0])
 
 //threeInARow "Helllo Wooorld"
 
@@ -34,7 +34,7 @@ let isKey (hashes:string[]) =
         |> Seq.exists (fun h -> h.Contains(find))
 
     match threeInARow hashes.[0] with
-    | Some c -> next1000Contains c.[0]
+    | Some c -> next1000Contains c
     | _ -> false
 let solve hasher targetIndex =
     Seq.initInfinite id
@@ -46,7 +46,7 @@ let solve hasher targetIndex =
     |> Seq.head
     |> fst
 
-solve (getHash "abc") 64 // 22728 
+solve (getHash "abc") 64 |> printfn "test: %d" // 22728 
 
 let input = "ngcjuoqr"
 solve (getHash input) 64 |> printfn "part a: %d"  // 18626
