@@ -26,4 +26,4 @@ let discs = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt") |
 
 solve discs |> printfn "Part a: %d" // 16824
 
-solve (Seq.append discs [(11,0)]) |> printfn "Part b: %d"
+solve (Seq.append discs [(11,0)]) |> printfn "Part b: %d" // 3543984
