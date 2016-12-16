@@ -38,8 +38,7 @@ let rec checkSum input =
 checkSumOnce "110010110100" // 100    
             
 let solve initialState diskSize =
-    let expanded = expand initialState diskSize
-    checkSum expanded
+    expand initialState diskSize |> checkSum
 
 solve "10000" 20 // 01100
 let sw = System.Diagnostics.Stopwatch.StartNew()
