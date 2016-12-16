@@ -40,6 +40,9 @@ let solve initialState diskSize =
     checkSum expanded
 
 solve "10000" 20 // 01100
+let sw = System.Diagnostics.Stopwatch.StartNew()
 solve "11110010111001001" 272 |> printfn "part a: %s" // 01110011101111011
-printfn "%A" System.DateTime.UtcNow
+printfn "%A" sw.Elapsed
+sw.Restart()
 solve "11110010111001001" 35651584 |> printfn "part b: %s" // 11001111011000111
+printfn "%A" sw.Elapsed
