@@ -41,5 +41,5 @@ let solve initialState diskSize =
 
 solve "10000" 20 // 01100
 solve "11110010111001001" 272 |> printfn "part a: %s" // 01110011101111011
-printfn "%A" DateTime.UtcNow
-solve "11110010111001001" 35651584 |> printfn "part b: %s"
+printfn "%A" System.DateTime.UtcNow
+solve "11110010111001001" 35651584 |> printfn "part b: %s" // 11001111011000111
