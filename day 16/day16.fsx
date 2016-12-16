@@ -1,10 +1,12 @@
+open System.Text
+let append (sb:StringBuilder) (c:char) = sb.Append (c) |> ignore
+
 let rec expandOnce (input:string) =
     let len = input.Length
-    let sb = System.Text.StringBuilder(input, 1 + len * 2)
-    sb.Append('0') |> ignore
-    let flip c = if c = '1' then '0' else '1'
-    [ for n in 1..len -> flip input.[len-n] ]
-        |> Seq.iter (sb.Append >> ignore)
+    let sb = StringBuilder(input, 1 + len * 2)
+    append sb '0'
+    for n in 1..len do 
+        append sb (if input.[len-n] = '1' then '0' else '1')
     sb.ToString()
 
 expandOnce "1" |> printfn "Test: %s (expect 100)"
@@ -20,11 +22,11 @@ let rec expand (initial:string) targetSize =
 
 let checkSumOnce (input:string) =
     // assume even length input
-    input 
-        |> Seq.chunkBySize 2 
-        |> Seq.map (fun [|a;b|] -> if a = b then '1' else '0')
-        |> Seq.toArray
-        |> System.String
+    let csLen = input.Length / 2
+    let sb = StringBuilder(csLen)
+    for n in 0..csLen-1 do
+        append sb (if input.[n*2] = input.[n*2+1] then '1' else '0')
+    sb.ToString()        
 
 checkSumOnce "110010110100" // 110101    
 checkSumOnce "110101" // 100 
