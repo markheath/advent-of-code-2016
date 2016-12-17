@@ -47,7 +47,9 @@ let solve passcode =
     s.path
 
 getValidMoves "hijkl" startState |> Seq.toArray |> printfn "Test %A" // down only
-
+getValidMoves "hijkl" { pos=(0,1); path="D"} |> Seq.toArray |> printfn "Test %A" // up or right
+getValidMoves "hijkl" { pos=(1,1); path="DR"} |> Seq.toArray |> printfn "Test %A" // all doors closed
+getValidMoves "hijkl" { pos=(1,1); path="DR"} |> Seq.toArray |> printfn "Test %A" // all doors closed
 let assertEquals actual expected =
     if actual = expected then
         printfn "PASS %A" actual
@@ -57,4 +59,4 @@ let assertEquals actual expected =
 assertEquals (solve "ihgpwlah") "DDRRRD"
 assertEquals (solve "kglvqrro") "DDUDRLRRUDRD"
 assertEquals (solve "ulqzkmiv") "DRURDRUDDLLDLUURRDULRLDUUDDDRR"
-(solve "pxxbnzuo").Length |> printfn "Part a: %d" // not 10
+solve "pxxbnzuo" |> printfn "Part a: %s" // not 10, RDULRDDRRD
