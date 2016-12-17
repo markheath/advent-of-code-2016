@@ -17,6 +17,9 @@ Read about my solutions on my blog:
  - [Day 11 Failure](http://markheath.net/post/aoc-2016-day11), [Success at Last!](http://markheath.net/post/aoc-2016-day11-take2)
  - [Day 12](http://markheath.net/post/aoc-2016-day12)
  - [Day 13](http://markheath.net/post/aoc-2016-day13)
+ - [Day 14](http://markheath.net/post/aoc-2016-day14)
+ - [Day 15](http://markheath.net/post/aoc-2016-day15)
+ - [Day 16](http://markheath.net/post/aoc-2016-day16)
  
 
 Be inspired by [other people's solutions](https://www.reddit.com/r/adventofcode/)
