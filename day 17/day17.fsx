@@ -68,5 +68,6 @@ let solveB passcode =
 assertEquals (solveB "ihgpwlah") 370
 assertEquals (solveB "kglvqrro") 492
 assertEquals (solveB "ulqzkmiv") 830
+solveB "pxxbnzuo" |> printfn "Part b: %d" // 752
 
 bfs isSolution (getValidMoves "ihgpwlah") startState 
