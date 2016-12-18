@@ -22,13 +22,11 @@ let assertEquals actual expected =
 assertEquals (generateNextRow "..^^.") ".^^^^"
 assertEquals (generateNextRow ".^^^^") "^^..^"
 
-
 let testData = [ ".^^.^.^^^^"; "^^^...^..^"; "^.^^.^.^^.";                    "..^^...^^^"; ".^^^^.^^.^"; "^^..^.^^.."; "^^^^..^^^."; "^..^^^^.^^";                    ".^^^..^.^^"; "^^.^^^..^^" ]
-let count (data:seq<string>) =
-    data 
-    |> Seq.map (fun s -> s |> Seq.filter ((=) '.') |> Seq.length) |> Seq.sum  
+let countSafe (data:seq<string>) =
+    data |> Seq.collect id |> Seq.filter ((=) '.') |> Seq.length 
 
-assertEquals (count testData) 38
+assertEquals (countSafe testData) 38
 
 let rec generateRows (startRow:string) rows = 
     seq {
@@ -42,10 +40,8 @@ for a,b in List.zip testRows testData do
     assertEquals a b 
 
 let solve startRow rows =
-     generateRows startRow rows 
-     |> Seq.collect id
-     |> Seq.filter ((=) '.')
-     |> Seq.length
+     generateRows startRow rows |> countSafe
+
 
 assertEquals (solve (testData |> List.head) 10) 38
 let input = "^.....^.^^^^^.^..^^.^.......^^..^^^..^^^^..^.^^.^.^....^^...^^.^^.^...^^.^^^^..^^.....^.^...^.^.^^.^"
