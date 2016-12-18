@@ -1,15 +1,14 @@
-let isSafe x =
-    match x with
+let next = function
     | [| '^';'^';'.'|]
     | [| '.';'^';'^'|]
     | [| '^';'.';'.'|]
-    | [| '.';'.';'^'|] -> false
-    | _ -> true
+    | [| '.';'.';'^'|] -> '^'
+    | _ -> '.'
 
-let generateNextRow (previousRow:string) =
+let generateNextRow previousRow =
     ("." + previousRow + ".") 
     |> Seq.windowed 3
-    |> Seq.map (fun x -> if isSafe x then '.' else '^')
+    |> Seq.map next
     |> Seq.toArray
     |> System.String
 
