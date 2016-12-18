@@ -27,12 +27,8 @@ let countSafe (data:seq<string>) =
 
 assertEquals (countSafe testData) 38
 
-let rec generateRows (startRow:string) rows = 
-    seq {
-        if rows > 0 then
-            yield startRow
-            yield! generateRows (generateNextRow startRow) (rows-1)
-    }
+let generateRows startRow rows = 
+    Seq.init (rows-1) id |> Seq.scan (fun s _ -> generateNextRow s) startRow 
 
 let testRows = generateRows (testData |> List.head) 10 |> Seq.toList
 for a,b in List.zip testRows testData do
