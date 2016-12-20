@@ -10,11 +10,9 @@ let getAllowed blockedRanges =
     let rec mergeRanges n ranges = seq {
         match ranges with
         | [] -> yield (n,4294967295L)
-        | head::tail ->
-            let lo,hi = head
+        | (lo,hi)::tail ->
             //printfn "%d %d,%d" n lo hi
-            if n < lo then
-                yield (n,lo-1L)
+            if n < lo then yield (n,lo-1L)
             yield! mergeRanges (max n (hi+1L)) tail
     }
     mergeRanges 0L (blockedRanges |> Seq.sortBy fst |> Seq.toList)
