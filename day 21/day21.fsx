@@ -24,9 +24,9 @@ let move x y (a:_[]) =
     a |> Array.mapi (fun n c ->
         if (n < x && n < y) || (n > x && n > y) then
             a.[n]
-        else if n = y then
+        elif n = y then
             a.[x]
-        else if x < y then
+        elif x < y then
             a.[n+1]
         else
             a.[n-1])
@@ -59,15 +59,8 @@ System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt")
 |> scramble "abcdefgh"
 |> printfn "Part a: %s" // gbhafcde
 
-let findUndo inst (st:char[]) =
-    [0..st.Length-1]
-    |> Seq.find (fun n -> 
-                    let applied = apply (RotateLeft n) st
-                    (apply inst applied) = st)
-
-let undoRotate c (input:char[]) =
-    let leftRot = findUndo (RotatePos c) input
-    rotateLeft leftRot input
+let undoRotate c (a:_[]) =
+    a |> Array.mapi (fun n c -> n, apply (RotateLeft n) a) |> Seq.find (fun (n,t) -> (apply (RotatePos c) t) = a) |> snd
 
 let undo = function
             | SwapPos (x,y) -> swap x y 
