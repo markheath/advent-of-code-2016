@@ -15,17 +15,16 @@ let nodes = input |> Array.choose parseLine
 seq {for (pos,s,u,a) in nodes do
         for (pos',s',u',a') in nodes do
             if pos <> pos' && u <> 0 && u < a' then
-                yield 1} |> Seq.length // part a: 960
+                yield 1} |> Seq.length |> printfn "part a: %d" // 960
 
-type Node = { Size:int; Avail: int; Used:int }
-type State = { DataPos: int*int; State: Map<int*int,Node>; Moves:int}
+let printPos (pos,s,u,a) =
+    if u = 0 then "_" elif u > 100 then "#" else "."
 
-let isSolution state = state.DataPos = (0,0)
+nodes |> Array.chunkBySize 30 |>
+    Array.map (Array.map printPos >> String.concat " ")
+    |> (fun a -> System.IO.File.WriteAllLines(__SOURCE_DIRECTORY__ + "\\grid.txt", a))
 
-let getChildren state = seq {
-    let canMove src dst =
-        state.State.[src].Used <= state.State.[dst].Avail
-    let x,y = state.pos
-    if x > 0 && canMove state.pos (x-1,y) then
-        yield
-}
+// from visual inspection, (grid is 30x33)
+// move empty 12 UP, 29 LEFT, 28 DOWN
+// move data 32 UP (but shuffle hole around is 4 more moves) : (31*5)+1
+12+29+28+(31*5)+1 |> printfn "part b: %d" //225
