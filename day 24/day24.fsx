@@ -36,12 +36,20 @@ let mazeFind (maze:string[]) c =
     [for y in 0..maze.Length-1 do 
         for x in 0 ..maze.[y].Length-1 do 
             if maze.[y].[x] = c then yield (x,y)]
-            |> List.head
+            |> List.tryFind (fun _ -> true)
 
-
+let buildShortestPathLookup maze =
+    ['0'..'9'] 
+    |> Seq.choose (mazeFind maze)
+    |> Seq.collect (fun c -> 
+                shortestFrom (mazeLookup maze) c
+                |> Seq.map (fun (t,d)-> ((mazeLookup maze c,t),d)))
+    |> Map.ofSeq
 let maze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt")
 let testMaze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\testinput.txt")
 
 
-shortestFrom (mazeLookup maze) (mazeFind maze '4')
+
+//shortestFrom (mazeLookup maze) (mazeFind maze '4' )
+buildShortestPathLookup testMaze
     |> Seq.iter (printfn "%A")
