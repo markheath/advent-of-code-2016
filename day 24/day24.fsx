@@ -46,18 +46,22 @@ let buildShortestPathLookup maze =
                 |> Seq.map (fun (t,d)-> ((mazeLookup maze c,t),d)))
     |> Map.ofSeq
 
-let findShortestPath maze =
+let findShortestPath maze ret =
     let lookup = buildShortestPathLookup maze
     let rec search (toVisit:char list) current (dist:int) = seq {
         match toVisit with
-        | [] ->  yield dist
+        | [] ->  yield dist, current
         | _ ->
             for v in toVisit do
                 let d = lookup.[(current,v)]
                 yield! search (toVisit |> List.filter ((<>) v)) v (dist+d)
     }
     let toVisit = ['1'..'9'] |> List.choose (mazeFind maze) |> List.map (mazeLookup maze)
-    search toVisit '0' 0
+    let paths = search toVisit '0' 0
+    if ret then
+        paths |> Seq.map (fun (d,c) -> d + lookup.[c,'0'])
+    else
+        paths |> Seq.map fst
 
 let maze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt")
 let testMaze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\testinput.txt")
@@ -67,5 +71,6 @@ let testMaze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\testinput.
 //shortestFrom (mazeLookup maze) (mazeFind maze '4' )
 //buildShortestPathLookup maze |> Seq.iter (printfn "%A")
 
-findShortestPath testMaze |> Seq.min |> printfn "Test: %d" // 14
-findShortestPath maze |> Seq.min |> printfn "Part a: %d" // 464
+findShortestPath testMaze false |> Seq.min |> printfn "Test: %d" // 14
+findShortestPath maze false |> Seq.min |> printfn "Part a: %d" // 464
+findShortestPath maze true |> Seq.min |> printfn "Part a: %d" // 464
