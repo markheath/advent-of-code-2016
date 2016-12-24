@@ -10,7 +10,6 @@ let bfs (isSolution:'a->bool) (getChildren:'a->seq<'a>) (start:'a) =
             let s = q.Dequeue()
             if isSolution s then 
                 yield s
-            //else
             for c in getChildren s do
                 q.Enqueue(c)
             yield! search()
