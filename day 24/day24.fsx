@@ -66,11 +66,6 @@ let findShortestPath maze ret =
 let maze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\input.txt")
 let testMaze = System.IO.File.ReadAllLines (__SOURCE_DIRECTORY__ + "\\testinput.txt")
 
-
-
-//shortestFrom (mazeLookup maze) (mazeFind maze '4' )
-//buildShortestPathLookup maze |> Seq.iter (printfn "%A")
-
 findShortestPath testMaze false |> Seq.min |> printfn "Test: %d" // 14
 findShortestPath maze false |> Seq.min |> printfn "Part a: %d" // 464
-findShortestPath maze true |> Seq.min |> printfn "Part a: %d" // 464
+findShortestPath maze true |> Seq.min |> printfn "Part b: %d" // 652
