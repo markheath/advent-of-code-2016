@@ -20,6 +20,15 @@ Read about my solutions on my blog:
  - [Day 14](http://markheath.net/post/aoc-2016-day14)
  - [Day 15](http://markheath.net/post/aoc-2016-day15)
  - [Day 16](http://markheath.net/post/aoc-2016-day16)
+ - [Day 17](http://markheath.net/post/aoc-2016-day17)
+ - [Day 18](http://markheath.net/post/aoc-2016-day18)
+ - [Day 19](http://markheath.net/post/aoc-2016-day19)
+ - [Day 20](http://markheath.net/post/aoc-2016-day20)
+ - [Day 21](http://markheath.net/post/aoc-2016-day21)
+ - [Day 22](http://markheath.net/post/aoc-2016-day22)
+ - [Day 23](http://markheath.net/post/aoc-2016-day23)
+ - [Day 24](http://markheath.net/post/aoc-2016-day24)
+ - [Day 25](http://markheath.net/post/aoc-2016-day25)
  
 
 Be inspired by [other people's solutions](https://www.reddit.com/r/adventofcode/)
